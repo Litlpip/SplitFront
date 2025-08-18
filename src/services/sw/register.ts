@@ -87,6 +87,12 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
 }
 
 export function registerSW(config?: Config) {
+  // Don't register service worker in development mode to prevent caching issues
+  if (import.meta.env.DEV) {
+    console.log('VibeSplit PWA: Service Worker отключен в режиме разработки для предотвращения кеширования');
+    return;
+  }
+
   if ('serviceWorker' in navigator) {
     const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -107,7 +113,7 @@ export function registerSW(config?: Config) {
         // service worker/PWA documentation.
         navigator.serviceWorker.ready.then(() => {
           console.log(
-            'VibeSplit PWA работает в режиме разработки с service worker кешированием. ' +
+            'VibeSplit PWA работает в production режиме с service worker кешированием. ' +
             'Узнать больше: https://cra.link/PWA'
           );
         });
