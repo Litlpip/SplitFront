@@ -1,0 +1,21 @@
+# Override для локальной разработки
+version: '3.8'
+
+services:
+  vibesplit-frontend:
+    # В dev режиме монтируем исходники для hot reload
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./index.html:/app/index.html:ro
+      - ./vite.config.ts:/app/vite.config.ts:ro
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001/api
+      - VITE_DEV_MODE=true
+    ports:
+      - "3000:80"
+
+  mock-backend:
+    # Включаем мок по умолчанию в dev режиме
+    profiles: []

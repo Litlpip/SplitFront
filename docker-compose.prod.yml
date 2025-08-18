@@ -1,0 +1,35 @@
+# Production конфигурация
+version: '3.8'
+
+services:
+  vibesplit-frontend:
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_SENTRY_DSN=${VITE_SENTRY_DSN}
+      - VITE_ANALYTICS_KEY=${VITE_ANALYTICS_KEY}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.vibesplit.environment=production"
+
+  # В продакшене не нужен мок API
+  mock-backend:
+    profiles:
+      - never

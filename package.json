@@ -9,7 +9,21 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "build:prod": "NODE_ENV=production npm run build",
+    "build:staging": "NODE_ENV=production VITE_ENVIRONMENT=staging npm run build",
+    "docker:build": "docker build -t vibesplit-pwa:latest .",
+    "docker:run": "docker run -p 3000:80 vibesplit-pwa:latest",
+    "docker:dev": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "deploy:local": "./scripts/deploy.sh development",
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "deploy:prod": "./scripts/deploy.sh production",
+    "health": "./scripts/health-check.sh",
+    "rollback": "./scripts/rollback.sh",
+    "test:build": "npm run build && npm run preview",
+    "clean": "rm -rf dist node_modules/.cache",
+    "pwa:audit": "npx lighthouse --only-categories=pwa --chrome-flags='--headless' http://localhost:4173"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
