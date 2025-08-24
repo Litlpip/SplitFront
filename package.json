@@ -23,15 +23,13 @@
     "rollback": "./scripts/rollback.sh",
     "test:build": "npm run build && npm run preview",
     "clean": "rm -rf dist node_modules/.cache",
-    "pwa:audit": "npx lighthouse --only-categories=pwa --chrome-flags='--headless' http://localhost:4173"
+    "pwa:audit": "npx lighthouse --only-categories=pwa --chrome-flags='--headless' http://localhost:4173",
+    "codegen": "make generate-client"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
     "@tanstack/react-query": "^5.8.4",
     "axios": "^1.6.1",
-    "framer-motion": "^10.16.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
@@ -39,6 +37,7 @@
     "react-router-dom": "^6.20.1"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.7.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.10.0",

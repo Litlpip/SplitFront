@@ -84,7 +84,7 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@chakra-ui/react', '@emotion/react', '@emotion/styled', 'framer-motion'],
+          ui: ['@chakra-ui/react'],
           utils: ['@tanstack/react-query', 'axios'],
         },
       },
