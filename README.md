@@ -43,7 +43,7 @@ PWA приложение для разделения совместных рас
 - **Сборка**: Vite 4
 - **UI**: Chakra UI + Emotion
 - **Роутинг**: React Router v6
-- **Состояние**: Zustand + React Query
+- **Состояние**: Mobx + React Query
 - **PWA**: Vite PWA Plugin + Workbox
 - **Иконки**: React Icons
 - **Формы**: React Hook Form
@@ -124,7 +124,7 @@ src/
 │   ├── auth/         # Аутентификация
 │   ├── sw/           # Service Worker
 │   └── storage/      # Локальное хранилище
-├── store/            # Zustand stores
+├── store/            # Mobx stores
 ├── types/            # TypeScript типы
 ├── utils/            # Утилиты
 ├── hooks/            # Custom hooks

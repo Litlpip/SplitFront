@@ -85,7 +85,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           ui: ['@chakra-ui/react', '@emotion/react', '@emotion/styled', 'framer-motion'],
-          utils: ['@tanstack/react-query', 'zustand', 'axios'],
+          utils: ['@tanstack/react-query', 'axios'],
         },
       },
     },

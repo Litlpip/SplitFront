@@ -12,7 +12,7 @@
 
 ### Data flow and state
 
-- Zustand
+- Mobx
 - React Query для Server state
 - React Hook Form для Form state
 

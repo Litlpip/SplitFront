@@ -2,7 +2,6 @@ import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { russianTheme } from '@/theme';
 import { AppRouter } from '@/router';
 import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator';
@@ -30,7 +29,7 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <ChakraProvider theme={russianTheme}>
+    <ChakraProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AppRouter />
