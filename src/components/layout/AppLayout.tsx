@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container } from '@chakra-ui/react';
+import { Box, Container, useColorModeValue } from '@chakra-ui/react';
 import { TabNavigation } from '@/components/navigation/TabNavigation';
 
 interface AppLayoutProps {
@@ -7,8 +7,10 @@ interface AppLayoutProps {
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const bgColor = useColorModeValue('gray.50', 'gray.900');
+  
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg={bgColor}>
       {/* Main content area */}
       <Container
         maxW="container.sm"

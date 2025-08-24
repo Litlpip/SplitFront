@@ -1,10 +1,11 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRouter } from '@/router';
 import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator';
+import theme from '@/theme';
 
 // Create React Query client with Russian-optimized settings
 const queryClient = new QueryClient({
@@ -29,15 +30,18 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <ChakraProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AppRouter />
-          <PWAInstallPrompt />
-          <OfflineIndicator />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ChakraProvider>
+    <>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+      <ChakraProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <AppRouter />
+            <PWAInstallPrompt />
+            <OfflineIndicator />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ChakraProvider>
+    </>
   );
 };
 

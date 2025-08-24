@@ -1,13 +1,16 @@
 import React from 'react';
-import { Box, Container, VStack, Text } from '@chakra-ui/react';
+import { Box, Container, VStack, Text, useColorModeValue } from '@chakra-ui/react';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
+  const bgColor = useColorModeValue('brand.50', 'gray.900');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+  
   return (
-    <Box minH="100vh" bg="brand.50">
+    <Box minH="100vh" bg={bgColor}>
       <Container maxW="container.sm" px={4} py={8}>
         <VStack spacing={8} align="stretch">
           {/* Logo and branding */}
@@ -32,7 +35,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
               </Text>
               <Text
                 fontSize="md"
-                color="gray.600"
+                color={textColor}
                 textAlign="center"
                 maxW="280px"
               >

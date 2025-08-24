@@ -8,6 +8,7 @@ import {
   Icon,
   Button,
   useColorModeValue,
+  Flex,
 } from '@chakra-ui/react';
 import {
   MdHome,
@@ -16,6 +17,7 @@ import {
   MdPerson,
 } from 'react-icons/md';
 import { ROUTES } from '@/constants';
+import { ColorModeToggle } from '@/components/ui/ColorModeToggle';
 
 interface TabItem {
   key: string;
@@ -80,8 +82,9 @@ export const TabNavigation: React.FC = () => {
       // Safe area for iOS devices
       paddingBottom="env(safe-area-inset-bottom)"
     >
-      <HStack spacing={0} justify="space-around" maxW="container.sm" mx="auto">
-        {tabs.map(tab => {
+      <Flex justify="space-between" align="center" maxW="container.sm" mx="auto">
+        <HStack spacing={0} justify="space-around" flex={1}>
+          {tabs.map(tab => {
           const isActive = isTabActive(tab.path);
 
           return (
@@ -95,20 +98,9 @@ export const TabNavigation: React.FC = () => {
               minW="60px"
               borderRadius="8px"
               onClick={() => navigate(tab.path)}
-              bg={isActive ? 'brand.50' : 'transparent'}
-              _hover={{
-                bg: isActive ? 'brand.100' : 'gray.100',
-              }}
-              _active={{
-                bg: isActive ? 'brand.200' : 'gray.200',
-              }}
             >
               <VStack spacing={1}>
-                <Icon
-                  as={tab.icon}
-                  boxSize={5}
-                  color={isActive ? 'brand.500' : 'gray.500'}
-                />
+                <Icon as={tab.icon} boxSize={5} />
                 <Text
                   fontSize="xs"
                   fontWeight={isActive ? 600 : 400}
@@ -121,7 +113,13 @@ export const TabNavigation: React.FC = () => {
             </Button>
           );
         })}
-      </HStack>
+        </HStack>
+        
+        {/* Кнопка переключения темы */}
+        <Box ml={2}>
+          <ColorModeToggle size="sm" />
+        </Box>
+      </Flex>
     </Box>
   );
 };
