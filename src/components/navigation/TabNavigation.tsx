@@ -54,7 +54,7 @@ const tabs: TabItem[] = [
 export const TabNavigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
@@ -81,9 +81,9 @@ export const TabNavigation: React.FC = () => {
       paddingBottom="env(safe-area-inset-bottom)"
     >
       <HStack spacing={0} justify="space-around" maxW="container.sm" mx="auto">
-        {tabs.map((tab) => {
+        {tabs.map(tab => {
           const isActive = isTabActive(tab.path);
-          
+
           return (
             <Button
               key={tab.key}

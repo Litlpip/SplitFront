@@ -10,7 +10,6 @@ import {
 } from '@chakra-ui/react';
 import { MdCheck } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/constants';
 
 const Welcome: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +30,8 @@ const Welcome: React.FC = () => {
           Больше никаких неловких ситуаций с деньгами между друзьями
         </Text>
         <Text color="gray.600">
-          VibeSplit помогает честно делить расходы и поддерживать дружеские отношения
+          VibeSplit помогает честно делить расходы и поддерживать дружеские
+          отношения
         </Text>
       </VStack>
 
@@ -55,14 +55,14 @@ const Welcome: React.FC = () => {
           size="lg"
           colorScheme="brand"
           w="full"
-          onClick={() => navigate(ROUTES.AUTH.REGISTER)}
+          onClick={() => navigate('/register')}
         >
           Начать пользоваться
         </Button>
-        
+
         <Text fontSize="xs" color="gray.500" textAlign="center">
-          Регистрируясь, вы соглашаетесь с условиями использования
-          и политикой конфиденциальности
+          Регистрируясь, вы соглашаетесь с условиями использования и политикой
+          конфиденциальности
         </Text>
       </VStack>
     </VStack>

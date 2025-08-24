@@ -21,7 +21,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export const PWAInstallPrompt: React.FC = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const toast = useToast();
 
@@ -31,7 +32,7 @@ export const PWAInstallPrompt: React.FC = () => {
       e.preventDefault();
       // Save the event so it can be triggered later
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // Show our custom install prompt after a delay
       setTimeout(() => {
         setShowInstallPrompt(true);
@@ -54,7 +55,10 @@ export const PWAInstallPrompt: React.FC = () => {
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt
+      );
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, [toast]);
@@ -114,7 +118,8 @@ export const PWAInstallPrompt: React.FC = () => {
               Установить VibeSplit?
             </Text>
             <Text fontSize="sm" color="gray.600">
-              Быстрый доступ с главного экрана, работа офлайн и уведомления о долгах.
+              Быстрый доступ с главного экрана, работа офлайн и уведомления о
+              долгах.
             </Text>
             <HStack spacing={2} w="full">
               <Button

@@ -32,12 +32,14 @@ docker run -p 3000:80 vibesplit-pwa
 ### 1. Требования к серверу
 
 **Минимальные требования:**
+
 - Ubuntu 22.04 LTS
 - 2 vCPU, 2GB RAM, 20GB SSD
 - Docker 24.0+
 - Nginx 1.24+
 
 **Рекомендуемые:**
+
 - 4 vCPU, 4GB RAM, 40GB NVMe SSD
 
 ### 2. Автоматическая установка
@@ -239,12 +241,14 @@ docker-compose -f docker-compose.monitoring.yml up -d
 ### Типичные проблемы
 
 **1. Контейнер не запускается**
+
 ```bash
 docker logs vibesplit-pwa
 # Проверьте ошибки в логах
 ```
 
 **2. PWA не работает**
+
 ```bash
 curl -I https://yourdomain.com/manifest.json
 curl -I https://yourdomain.com/sw.js
@@ -252,12 +256,14 @@ curl -I https://yourdomain.com/sw.js
 ```
 
 **3. Высокое потребление ресурсов**
+
 ```bash
 docker stats vibesplit-pwa
 # Проверьте использование CPU/Memory
 ```
 
 **4. Проблемы с SSL**
+
 ```bash
 sudo certbot certificates
 sudo nginx -t

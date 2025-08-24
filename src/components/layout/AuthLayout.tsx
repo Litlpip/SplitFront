@@ -30,7 +30,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
               <Text fontSize="2xl" fontWeight="700" color="brand.600">
                 VibeSplit
               </Text>
-              <Text fontSize="md" color="gray.600" textAlign="center" maxW="280px">
+              <Text
+                fontSize="md"
+                color="gray.600"
+                textAlign="center"
+                maxW="280px"
+              >
                 Честное деление расходов между друзьями
               </Text>
             </VStack>

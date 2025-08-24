@@ -18,12 +18,12 @@ export const OfflineIndicator: React.FC = () => {
 
   useEffect(() => {
     let wasOfflineRef = false;
-    let restoreTimeoutId: NodeJS.Timeout;
+    let restoreTimeoutId: number;
 
     const handleOnline = () => {
       console.log('Connection restored. Was offline:', wasOfflineRef);
       setIsOnline(true);
-      
+
       // Only show restored message if we were actually offline before
       if (wasOfflineRef) {
         setShowRestoredMessage(true);
@@ -65,7 +65,11 @@ export const OfflineIndicator: React.FC = () => {
     <>
       {/* Offline indicator - only show when actually offline and not showing restore message */}
       {!isOnline && !showRestoredMessage && (
-        <Slide direction="top" in={!isOnline && !showRestoredMessage} style={{ zIndex: 1001 }}>
+        <Slide
+          direction="top"
+          in={!isOnline && !showRestoredMessage}
+          style={{ zIndex: 1001 }}
+        >
           <Box
             bg={bgColor}
             color="white"

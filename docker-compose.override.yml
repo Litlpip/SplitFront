@@ -14,7 +14,7 @@ services:
       - VITE_API_URL=http://localhost:3001/api
       - VITE_DEV_MODE=true
     ports:
-      - "3000:80"
+      - '3000:80'
 
   mock-backend:
     # Включаем мок по умолчанию в dev режиме

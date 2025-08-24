@@ -20,9 +20,7 @@ const Dashboard: React.FC = () => {
         <Text fontSize="2xl" fontWeight="700" color="brand.600" mb={2}>
           Добро пожаловать!
         </Text>
-        <Text color="gray.600">
-          Ваш баланс и последние активности
-        </Text>
+        <Text color="gray.600">Ваш баланс и последние активности</Text>
       </Box>
 
       {/* Balance overview */}
@@ -45,13 +43,8 @@ const Dashboard: React.FC = () => {
                 Все погашено
               </Badge>
             </HStack>
-            
-            <Button
-              leftIcon={<MdAdd />}
-              colorScheme="brand"
-              size="lg"
-              w="full"
-            >
+
+            <Button leftIcon={<MdAdd />} colorScheme="brand" size="lg" w="full">
               Добавить трату
             </Button>
           </VStack>
@@ -63,7 +56,7 @@ const Dashboard: React.FC = () => {
         <Text fontSize="lg" fontWeight="600" color="gray.700">
           Быстрые действия
         </Text>
-        
+
         <HStack spacing={3}>
           <Button flex={1} variant="outline" colorScheme="brand">
             Создать группу
@@ -79,7 +72,7 @@ const Dashboard: React.FC = () => {
         <Text fontSize="lg" fontWeight="600" color="gray.700">
           Последняя активность
         </Text>
-        
+
         <Card>
           <CardBody textAlign="center" py={8}>
             <Text color="gray.500" fontSize="sm">

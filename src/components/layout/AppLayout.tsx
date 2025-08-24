@@ -10,15 +10,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <Box minH="100vh" bg="gray.50">
       {/* Main content area */}
-      <Container 
-        maxW="container.sm" 
-        px={4} 
+      <Container
+        maxW="container.sm"
+        px={4}
         py={4}
         pb="80px" // Space for bottom navigation
       >
         {children}
       </Container>
-      
+
       {/* Bottom tab navigation */}
       <TabNavigation />
     </Box>

@@ -2,10 +2,10 @@
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-  window.location.hostname === '[::1]' ||
-  window.location.hostname.match(
-    /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-  )
+    window.location.hostname === '[::1]' ||
+    window.location.hostname.match(
+      /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+    )
 );
 
 type Config = {
@@ -16,7 +16,7 @@ type Config = {
 function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
-    .then((registration) => {
+    .then(registration => {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -51,7 +51,7 @@ function registerValidSW(swUrl: string, config?: Config) {
         };
       };
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('Ошибка регистрации service worker:', error);
     });
 }
@@ -61,7 +61,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
   fetch(swUrl, {
     headers: { 'Service-Worker': 'script' },
   })
-    .then((response) => {
+    .then(response => {
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get('content-type');
       if (
@@ -69,7 +69,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
         // No service worker found. Probably a different app. Reload the page.
-        navigator.serviceWorker.ready.then((registration) => {
+        navigator.serviceWorker.ready.then(registration => {
           registration.unregister().then(() => {
             window.location.reload();
           });
@@ -89,7 +89,9 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
 export function registerSW(config?: Config) {
   // Don't register service worker in development mode to prevent caching issues
   if (import.meta.env.DEV) {
-    console.log('VibeSplit PWA: Service Worker отключен в режиме разработки для предотвращения кеширования');
+    console.log(
+      'VibeSplit PWA: Service Worker отключен в режиме разработки для предотвращения кеширования'
+    );
     return;
   }
 
@@ -114,7 +116,7 @@ export function registerSW(config?: Config) {
         navigator.serviceWorker.ready.then(() => {
           console.log(
             'VibeSplit PWA работает в production режиме с service worker кешированием. ' +
-            'Узнать больше: https://cra.link/PWA'
+              'Узнать больше: https://cra.link/PWA'
           );
         });
       } else {
@@ -128,10 +130,10 @@ export function registerSW(config?: Config) {
 export function unregister() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
-      .then((registration) => {
+      .then(registration => {
         registration.unregister();
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error.message);
       });
   }

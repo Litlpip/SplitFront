@@ -7,7 +7,7 @@
 
 ### Core
 
-- React + PWA 
+- React + PWA
 - Typescript
 
 ### Data flow and state

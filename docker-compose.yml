@@ -10,7 +10,7 @@ services:
       target: production
     container_name: vibesplit-pwa
     ports:
-      - "3000:80"
+      - '3000:80'
     environment:
       - NODE_ENV=production
       - VITE_API_URL=${VITE_API_URL:-http://localhost:3001/api}
@@ -24,47 +24,43 @@ services:
     networks:
       - vibesplit-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
-      - "com.vibesplit.service=frontend"
-      - "com.vibesplit.version=1.0.0"
+      - 'com.vibesplit.service=frontend'
+      - 'com.vibesplit.version=1.0.0'
 
   # Мок API сервер для тестирования (опционально)
   mock-backend:
     image: wiremock/wiremock:2.35.0
     container_name: vibesplit-mock-api
     ports:
-      - "3001:8080"
+      - '3001:8080'
     volumes:
       - ./mock-api:/home/wiremock:ro
-    command: [
-      "--global-response-templating",
-      "--verbose",
-      "--port", "8080"
-    ]
+    command: ['--global-response-templating', '--verbose', '--port', '8080']
     networks:
       - vibesplit-network
     profiles:
       - testing
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/__admin/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/__admin/health']
       interval: 30s
       timeout: 5s
       retries: 3
     labels:
-      - "com.vibesplit.service=mock-api"
+      - 'com.vibesplit.service=mock-api'
 
   # Nginx для продакшен-подобного прокси (опционально)
   nginx-proxy:
     image: nginx:1.24-alpine
     container_name: vibesplit-proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx/production:/etc/nginx/conf.d:ro
       - ./ssl:/etc/nginx/ssl:ro
@@ -77,14 +73,14 @@ services:
       - production-test
     restart: unless-stopped
     labels:
-      - "com.vibesplit.service=proxy"
+      - 'com.vibesplit.service=proxy'
 
   # Prometheus для мониторинга (опционально)
   prometheus:
     image: prom/prometheus:latest
     container_name: vibesplit-prometheus
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -101,14 +97,14 @@ services:
       - monitoring
     restart: unless-stopped
     labels:
-      - "com.vibesplit.service=monitoring"
+      - 'com.vibesplit.service=monitoring'
 
   # Grafana для визуализации метрик (опционально)
   grafana:
     image: grafana/grafana:latest
     container_name: vibesplit-grafana
     ports:
-      - "3002:3000"
+      - '3002:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
       - GF_SERVER_DOMAIN=localhost
@@ -124,7 +120,7 @@ services:
       - monitoring
     restart: unless-stopped
     labels:
-      - "com.vibesplit.service=dashboard"
+      - 'com.vibesplit.service=dashboard'
 
 # Именованные тома для персистентности данных
 volumes:

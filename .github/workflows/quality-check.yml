@@ -2,174 +2,174 @@ name: 'Quality Check'
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   # Проверка качества кода
   code-quality:
     runs-on: ubuntu-latest
     name: 'Code Quality Check'
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run ESLint
-      run: npm run lint
-      
-    - name: Run TypeScript type checking
-      run: npm run type-check
-      
-    - name: Check package vulnerabilities
-      run: npm audit --audit-level=high
-      
-    - name: Test build process
-      run: npm run build
-      env:
-        VITE_API_URL: https://api-staging.vibesplit.com
-        
-    - name: Check bundle size
-      run: |
-        BUNDLE_SIZE=$(du -s dist/ | cut -f1)
-        echo "Bundle size: ${BUNDLE_SIZE}KB"
-        
-        if [ $BUNDLE_SIZE -gt 51200 ]; then  # 50MB limit
-          echo "❌ Bundle size too large: ${BUNDLE_SIZE}KB"
-          echo "Consider code splitting or removing unused dependencies"
-          exit 1
-        else
-          echo "✅ Bundle size is acceptable: ${BUNDLE_SIZE}KB"
-        fi
-        
-    - name: Comment bundle size on PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          const { execSync } = require('child_process');
-          
-          const bundleSize = execSync('du -s dist/ | cut -f1').toString().trim();
-          
-          const comment = `## 📦 Bundle Analysis
-          
-          **Bundle Size**: ${bundleSize}KB
-          
-          ${bundleSize > 51200 ? '❌ **Warning**: Bundle size exceeds 50MB limit!' : '✅ Bundle size is within acceptable limits'}
-          
-          ### Build artifacts:
-          - ✅ index.html
-          - ✅ manifest.json
-          - ✅ Service Worker
-          
-          *Generated automatically by GitHub Actions*`;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript type checking
+        run: npm run type-check
+
+      - name: Check package vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Test build process
+        run: npm run build
+        env:
+          VITE_API_URL: https://api-staging.vibesplit.com
+
+      - name: Check bundle size
+        run: |
+          BUNDLE_SIZE=$(du -s dist/ | cut -f1)
+          echo "Bundle size: ${BUNDLE_SIZE}KB"
+
+          if [ $BUNDLE_SIZE -gt 51200 ]; then  # 50MB limit
+            echo "❌ Bundle size too large: ${BUNDLE_SIZE}KB"
+            echo "Consider code splitting or removing unused dependencies"
+            exit 1
+          else
+            echo "✅ Bundle size is acceptable: ${BUNDLE_SIZE}KB"
+          fi
+
+      - name: Comment bundle size on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            const bundleSize = execSync('du -s dist/ | cut -f1').toString().trim();
+
+            const comment = `## 📦 Bundle Analysis
+
+            **Bundle Size**: ${bundleSize}KB
+
+            ${bundleSize > 51200 ? '❌ **Warning**: Bundle size exceeds 50MB limit!' : '✅ Bundle size is within acceptable limits'}
+
+            ### Build artifacts:
+            - ✅ index.html
+            - ✅ manifest.json
+            - ✅ Service Worker
+
+            *Generated automatically by GitHub Actions*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
   # Проверка PWA требований
   pwa-audit:
     runs-on: ubuntu-latest
     name: 'PWA Audit'
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build application
-      run: npm run build
-      env:
-        VITE_API_URL: https://api-staging.vibesplit.com
-        
-    - name: Install Lighthouse CI
-      run: npm install -g @lhci/cli
-      
-    - name: Serve built app
-      run: |
-        npm run preview &
-        sleep 10
-      
-    - name: Run Lighthouse CI
-      run: lhci autorun
-      env:
-        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-        
-    - name: Check PWA requirements
-      run: |
-        echo "🔍 Checking PWA requirements..."
-        
-        # Проверяем наличие обязательных PWA файлов
-        if [ ! -f "dist/manifest.json" ]; then
-          echo "❌ manifest.json not found"
-          exit 1
-        fi
-        
-        if [ ! -f "dist/sw.js" ]; then
-          echo "❌ Service Worker not found"
-          exit 1
-        fi
-        
-        # Проверяем содержимое манифеста
-        if ! grep -q '"name"' dist/manifest.json; then
-          echo "❌ manifest.json missing required 'name' field"
-          exit 1
-        fi
-        
-        if ! grep -q '"start_url"' dist/manifest.json; then
-          echo "❌ manifest.json missing required 'start_url' field"
-          exit 1
-        fi
-        
-        if ! grep -q '"icons"' dist/manifest.json; then
-          echo "❌ manifest.json missing required 'icons' field"
-          exit 1
-        fi
-        
-        echo "✅ PWA requirements check passed"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_API_URL: https://api-staging.vibesplit.com
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli
+
+      - name: Serve built app
+        run: |
+          npm run preview &
+          sleep 10
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Check PWA requirements
+        run: |
+          echo "🔍 Checking PWA requirements..."
+
+          # Проверяем наличие обязательных PWA файлов
+          if [ ! -f "dist/manifest.json" ]; then
+            echo "❌ manifest.json not found"
+            exit 1
+          fi
+
+          if [ ! -f "dist/sw.js" ]; then
+            echo "❌ Service Worker not found"
+            exit 1
+          fi
+
+          # Проверяем содержимое манифеста
+          if ! grep -q '"name"' dist/manifest.json; then
+            echo "❌ manifest.json missing required 'name' field"
+            exit 1
+          fi
+
+          if ! grep -q '"start_url"' dist/manifest.json; then
+            echo "❌ manifest.json missing required 'start_url' field"
+            exit 1
+          fi
+
+          if ! grep -q '"icons"' dist/manifest.json; then
+            echo "❌ manifest.json missing required 'icons' field"
+            exit 1
+          fi
+
+          echo "✅ PWA requirements check passed"
 
   # Проверка безопасности
   security-audit:
     runs-on: ubuntu-latest
     name: 'Security Audit'
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'table'
-        
-    - name: Scan for secrets
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        base: main
-        head: HEAD
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD

@@ -7,6 +7,7 @@
 Данная стратегия деплоя разработана для PWA приложения VibeSplit с учетом требований производительности, безопасности и специфики Progressive Web App технологий. Архитектура предусматривает деплой фронтенда на отдельный VPS с использованием Docker контейнеризации и Nginx для обслуживания статических файлов с оптимизацией для PWA функциональности.
 
 **Ключевые принципы деплоя:**
+
 - **Контейнеризация**: Docker для изоляции и портабельности
 - **HTTPS everywhere**: Обязательное шифрование для PWA функций
 - **CDN-ready**: Оптимизация для интеграции с CDN
@@ -68,6 +69,7 @@
 ### 1.1 VPS Сервер (Frontend)
 
 **Минимальные требования:**
+
 - **OS**: Ubuntu 22.04 LTS
 - **CPU**: 2 vCPU cores
 - **RAM**: 2 GB
@@ -75,6 +77,7 @@
 - **Network**: 100 Mbps
 
 **Рекомендуемые требования:**
+
 - **OS**: Ubuntu 22.04 LTS
 - **CPU**: 4 vCPU cores
 - **RAM**: 4 GB
@@ -84,6 +87,7 @@
 ### 1.2 Программное обеспечение
 
 **Основные компоненты:**
+
 - Docker Engine 24.0+
 - Docker Compose 2.20+
 - Nginx 1.24+
@@ -93,6 +97,7 @@
 - Prometheus Node Exporter
 
 **Мониторинг и логирование:**
+
 - Docker logs
 - Nginx access/error logs
 - Logrotate
@@ -183,7 +188,7 @@ services:
       target: production
     container_name: vibesplit-pwa
     ports:
-      - "3000:80"
+      - '3000:80'
     environment:
       - NODE_ENV=production
       - VITE_API_URL=http://localhost:3001/api
@@ -193,7 +198,7 @@ services:
     networks:
       - vibesplit-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -204,10 +209,10 @@ services:
     image: wiremock/wiremock:2.35.0
     container_name: vibesplit-mock-api
     ports:
-      - "3001:8080"
+      - '3001:8080'
     volumes:
       - ./mock-api:/home/wiremock
-    command: ["--global-response-templating", "--verbose"]
+    command: ['--global-response-templating', '--verbose']
     networks:
       - vibesplit-network
 
@@ -239,14 +244,14 @@ http {
     # Базовые настройки
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
-    
+
     # Логирование
     log_format main '$remote_addr - $remote_user [$time_local] "$request" '
                     '$status $body_bytes_sent "$http_referer" '
                     '"$http_user_agent" "$http_x_forwarded_for"';
-    
+
     access_log /var/log/nginx/access.log main;
-    
+
     # Производительность
     sendfile on;
     tcp_nopush on;
@@ -254,7 +259,7 @@ http {
     keepalive_timeout 65;
     types_hash_max_size 2048;
     server_tokens off;
-    
+
     # Сжатие
     gzip on;
     gzip_vary on;
@@ -271,18 +276,18 @@ http {
         application/json
         application/manifest+json
         image/svg+xml;
-    
+
     # Brotli сжатие (если модуль доступен)
     # brotli on;
     # brotli_comp_level 6;
     # brotli_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-    
+
     # Безопасность
     add_header X-Frame-Options DENY always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    
+
     # Подключаем конфигурации сайтов
     include /etc/nginx/conf.d/*.conf;
 }
@@ -296,15 +301,15 @@ server {
     server_name vibesplit.com www.vibesplit.com;
     root /usr/share/nginx/html;
     index index.html;
-    
+
     # Безопасность PWA
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.vibesplit.com; font-src 'self'; object-src 'none'; media-src 'self'; frame-src 'none';" always;
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-    
+
     # PWA специфичные заголовки
     add_header X-PWA-Cache-Control "public, max-age=31536000" always;
-    
+
     # Service Worker - должен обслуживаться с правильными заголовками
     location /sw.js {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
@@ -313,26 +318,26 @@ server {
         add_header Service-Worker-Allowed "/";
         try_files $uri =404;
     }
-    
+
     # Web App Manifest
     location /manifest.json {
         add_header Cache-Control "public, max-age=86400";
         add_header Content-Type "application/manifest+json";
         try_files $uri =404;
     }
-    
+
     # PWA иконки - долгое кеширование
     location ~* ^/(?:pwa-|maskable-|apple-touch-)?icon.*\.(?:png|jpg|jpeg|gif|ico|svg)$ {
         add_header Cache-Control "public, max-age=31536000";
         try_files $uri =404;
     }
-    
+
     # Статические ресурсы - долгое кеширование
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         add_header Cache-Control "public, max-age=31536000";
         try_files $uri =404;
     }
-    
+
     # HTML файлы - без кеширования для получения обновлений
     location ~* \.html$ {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
@@ -340,7 +345,7 @@ server {
         add_header Expires "0";
         try_files $uri /index.html;
     }
-    
+
     # API прокси к бэкенду
     location /api/ {
         proxy_pass https://api.vibesplit.com/;
@@ -351,13 +356,13 @@ server {
         proxy_connect_timeout 30s;
         proxy_send_timeout 30s;
         proxy_read_timeout 30s;
-        
+
         # CORS заголовки для API
         add_header Access-Control-Allow-Origin "https://vibesplit.com" always;
         add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
         add_header Access-Control-Allow-Credentials "true" always;
-        
+
         # Обработка preflight запросов
         if ($request_method = 'OPTIONS') {
             add_header Access-Control-Allow-Origin "https://vibesplit.com";
@@ -369,32 +374,32 @@ server {
             return 204;
         }
     }
-    
+
     # Основная SPA логика - все неизвестные маршруты направляем в index.html
     location / {
         try_files $uri $uri/ /index.html;
-        
+
         # Заголовки для SPA
         add_header Cache-Control "no-cache, no-store, must-revalidate";
         add_header Pragma "no-cache";
         add_header Expires "0";
     }
-    
+
     # Offline страница для PWA
     location /offline.html {
         internal;
         add_header Cache-Control "public, max-age=86400";
     }
-    
+
     # Блокировка доступа к служебным файлам
     location ~ /\. {
         deny all;
     }
-    
+
     location ~ ^/(\.user.ini|\.htaccess|\.htpasswd|\.ssh|\.git) {
         deny all;
     }
-    
+
     # Health check endpoint
     location /health {
         access_log off;
@@ -409,24 +414,24 @@ server {
     server_name vibesplit.com www.vibesplit.com;
     root /usr/share/nginx/html;
     index index.html;
-    
+
     # SSL сертификаты Let's Encrypt
     ssl_certificate /etc/letsencrypt/live/vibesplit.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/vibesplit.com/privkey.pem;
-    
+
     # SSL конфигурация
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:50m;
     ssl_session_tickets off;
-    
+
     # Современные SSL протоколы
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
-    
+
     # HSTS
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-    
+
     # Включаем конфигурацию из HTTP блока
     include /etc/nginx/snippets/vibesplit-common.conf;
 }
@@ -436,11 +441,11 @@ server {
     if ($host = www.vibesplit.com) {
         return 301 https://$host$request_uri;
     }
-    
+
     if ($host = vibesplit.com) {
         return 301 https://$host$request_uri;
     }
-    
+
     listen 80;
     server_name vibesplit.com www.vibesplit.com;
     return 404;
@@ -456,9 +461,9 @@ name: 'Deploy VibeSplit PWA to Production'
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -467,8 +472,8 @@ on:
         default: 'production'
         type: choice
         options:
-        - staging
-        - production
+          - staging
+          - production
 
 env:
   REGISTRY: ghcr.io
@@ -479,142 +484,142 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run linting
-      run: npm run lint
-      
-    - name: Run type checking
-      run: npm run type-check
-      
-    - name: Run tests
-      run: npm test
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run type-check
+
+      - name: Run tests
+        run: npm test
+
   # Билд и деплой
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build PWA application
-      run: npm run build
-      env:
-        VITE_API_URL: ${{ secrets.VITE_API_URL }}
-        VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
-        VITE_ANALYTICS_KEY: ${{ secrets.VITE_ANALYTICS_KEY }}
-        
-    - name: Run build tests
-      run: npm run preview & sleep 5 && curl -f http://localhost:4173/ && pkill -f preview
-      
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Extract metadata for Docker
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
-          
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        
-    - name: Deploy to VPS
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_PORT }}
-        script: |
-          # Логинимся в Container Registry
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
-          
-          # Останавливаем текущий контейнер
-          docker stop vibesplit-pwa || true
-          docker rm vibesplit-pwa || true
-          
-          # Удаляем старые образы
-          docker image prune -f
-          
-          # Запускаем новый контейнер
-          docker run -d \
-            --name vibesplit-pwa \
-            --restart unless-stopped \
-            -p 8080:80 \
-            -v /var/log/vibesplit:/var/log/nginx \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          
-          # Проверяем health check
-          sleep 10
-          curl -f http://localhost:8080/health || exit 1
-          
-          # Перезагружаем Nginx на хосте для применения новых настроек
-          sudo nginx -t && sudo systemctl reload nginx
-          
-    - name: Run post-deploy tests
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_PORT }}
-        script: |
-          # Проверяем доступность приложения
-          curl -f https://vibesplit.com/ || exit 1
-          
-          # Проверяем PWA манифест
-          curl -f https://vibesplit.com/manifest.json || exit 1
-          
-          # Проверяем Service Worker
-          curl -f https://vibesplit.com/sw.js || exit 1
-          
-    - name: Notify deployment status
-      if: always()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        channel: '#deployments'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        fields: repo,message,commit,author,action,eventName,ref,workflow
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build PWA application
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_ANALYTICS_KEY: ${{ secrets.VITE_ANALYTICS_KEY }}
+
+      - name: Run build tests
+        run: npm run preview & sleep 5 && curl -f http://localhost:4173/ && pkill -f preview
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Логинимся в Container Registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+            # Останавливаем текущий контейнер
+            docker stop vibesplit-pwa || true
+            docker rm vibesplit-pwa || true
+
+            # Удаляем старые образы
+            docker image prune -f
+
+            # Запускаем новый контейнер
+            docker run -d \
+              --name vibesplit-pwa \
+              --restart unless-stopped \
+              -p 8080:80 \
+              -v /var/log/vibesplit:/var/log/nginx \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+            # Проверяем health check
+            sleep 10
+            curl -f http://localhost:8080/health || exit 1
+
+            # Перезагружаем Nginx на хосте для применения новых настроек
+            sudo nginx -t && sudo systemctl reload nginx
+
+      - name: Run post-deploy tests
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Проверяем доступность приложения
+            curl -f https://vibesplit.com/ || exit 1
+
+            # Проверяем PWA манифест
+            curl -f https://vibesplit.com/manifest.json || exit 1
+
+            # Проверяем Service Worker
+            curl -f https://vibesplit.com/sw.js || exit 1
+
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
 ```
 
 ### 4.2 Workflow для staging окружения
@@ -624,45 +629,45 @@ name: 'Deploy to Staging'
 
 on:
   push:
-    branches: [ develop, staging ]
+    branches: [develop, staging]
   workflow_dispatch:
 
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build for staging
-      run: npm run build
-      env:
-        VITE_API_URL: ${{ secrets.STAGING_API_URL }}
-        VITE_ENVIRONMENT: staging
-        
-    - name: Deploy to staging server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.STAGING_VPS_HOST }}
-        username: ${{ secrets.STAGING_VPS_USERNAME }}
-        key: ${{ secrets.STAGING_VPS_SSH_KEY }}
-        script: |
-          cd /var/www/vibesplit-staging
-          git pull origin staging
-          npm ci
-          npm run build
-          sudo systemctl reload nginx
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for staging
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_ENVIRONMENT: staging
+
+      - name: Deploy to staging server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.STAGING_VPS_HOST }}
+          username: ${{ secrets.STAGING_VPS_USERNAME }}
+          key: ${{ secrets.STAGING_VPS_SSH_KEY }}
+          script: |
+            cd /var/www/vibesplit-staging
+            git pull origin staging
+            npm ci
+            npm run build
+            sudo systemctl reload nginx
 ```
 
 ## 5. SSL/TLS сертификаты и безопасность
@@ -778,7 +783,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -798,7 +803,7 @@ services:
     container_name: node-exporter
     restart: unless-stopped
     ports:
-      - "9100:9100"
+      - '9100:9100'
     networks:
       - monitoring
 
@@ -806,7 +811,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
-      - "3001:3000"
+      - '3001:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin123
     volumes:
@@ -820,7 +825,7 @@ services:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: nginx-exporter
     ports:
-      - "9113:9113"
+      - '9113:9113'
     command:
       - '-nginx.scrape-uri=http://nginx:80/nginx_status'
     networks:
@@ -969,15 +974,15 @@ sleep 15
 # Проверяем health check
 if curl -f "http://localhost:808${NEW_COLOR:0:1}/health"; then
     echo "✅ Новая версия запущена успешно"
-    
+
     # Переключаем Nginx на новый порт
     sed -i "s/808./808${NEW_COLOR:0:1}/g" /etc/nginx/sites-available/vibesplit
     nginx -t && systemctl reload nginx
-    
+
     # Останавливаем старый контейнер
     docker stop "vibesplit-pwa-$CURRENT_COLOR" || true
     docker rm "vibesplit-pwa-$CURRENT_COLOR" || true
-    
+
     echo "🎉 Деплой завершен успешно!"
 else
     echo "❌ Health check не прошел, откатываемся..."

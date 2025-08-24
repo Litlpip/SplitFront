@@ -22,12 +22,12 @@ services:
         max_attempts: 3
         window: 120s
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
     labels:
-      - "com.vibesplit.environment=production"
+      - 'com.vibesplit.environment=production'
 
   # В продакшене не нужен мок API
   mock-backend:
